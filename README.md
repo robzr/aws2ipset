@@ -14,3 +14,11 @@ Once installed, the "aws" ipset can be used in iptables rules, ex:
 
 	iptables -A input_wan_rule -p tcp --dport 22 -m set --set aws src -j ALLOW
 
+**TBD**
+
+Add uci lists & config parsing logic to allow user to select which service(s)/region(s) are used, ex:
+
+	option FilterOut '.*/us-.*east-.*'  # filter out all us data centers in the east, northeast, southeast, etc.
+	option FilterIn 'AMAZON/us-'        # defaults to everything, or '/'
+
+(Assemble variable into $service/$region then check against sed regex processing.)
