@@ -1,5 +1,11 @@
 # aws2ipset
-Simple script that syncs the official Amazon AWS IP range JSON feed into an Linux ipset for use with iptables firewall rules
+Simple OpenWRT script that syncs the official Amazon AWS IP range JSON feed into an Linux ipset for use with iptables firewall rules
+
+OpenWRT Forum post: https://forum.openwrt.org/viewtopic.php?pid=308408
+
+**Dependencies**
+
+- curl, ca-certificates, ipset, kmod-ipt-ipset packages
 
 **Installation**
 

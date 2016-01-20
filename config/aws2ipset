@@ -1,0 +1,18 @@
+#
+# aws2ipset config - https://github.com/robzr/aws2ipset
+#
+config aws2ipset
+  # Add the AWS Service/Region to the ipset comments
+  	option	useIpsetComments	'false'
+
+  # For the next two filter options, the string being filtered
+  # against is Service/Region, ex: AMAZON/us-northeast-1
+
+  # Regex to filter Out (exclude) from the ipset
+  	option	filterOut	'' # Defaults to nothing
+
+  # Regex to filter In (include) from the ipset
+  	option	filterIn	'/' # Defaults to everything
+ 
+  # This would filter in only us based AMAZON services
+  #	option	filterIn	'AMAZON/us-'  
