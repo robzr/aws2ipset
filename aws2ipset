@@ -12,8 +12,28 @@ setName='aws'
 swingSetName="$setName"-swing
 tmpFile=`mktemp`
 
+uciLoadVar () {
+  local getUci
+  getUci=`uci -q get ${uciSection}."$1"` || getUci="$2"
+  eval $1=\'$getUci\';
+}
+uciLoad() {
+  local delim="
+"
+  [ "$1" = -d ] && { delim="$2"; shift; shift; }
+  uci -q -d"$delim" get "$uciSection.$1" 2>/dev/null || while [ -n "$2" ]; do echo $2; shift; done
+}
+
+# Make changes to these uci values in /etc/config/sub2rbl
+uciLoadVar useIpsetComments 'false'
+uciLoadVar filterIn '/'
+uciLoadVar filterOut ''
+
 # retrieve JSON file from Amazon
 curl -so "$tmpFile" "$awsIPRangeURL" || { echo "Error running curl" ; exit -1 ; }
+
+# Apply filter in/out
+/bin/sed -ni '' -e "\#${filterOut}#d" -e "\#${filterIn}#p" -i "$tmpFile" || exit -1
 
 # create sets if necessary
 for set in $setName $swingSetName ; do
@@ -22,10 +42,17 @@ done
 
 # process file
 while read line ; do
+cmdSed="/usr/bin/sed -ne '\#${filterOut}#d' -e '\#${filterIn}#p'"
   key=`echo $line | cut -f2 -d\"`
   case $key in
     ip_prefix|region|service) eval $key="`echo $line | cut -f4 -d\\"`" ;;
-    "},") ipset add -q "$swingSetName" "$ip_prefix" ;; # removed: comment "$service $region"
+    "},") 
+      if $useIpsetComments ; then
+        ipset add -q "$swingSetName" "$ip_prefix" comment "$service/$region"
+      else
+        ipset add -q "$swingSetName" "$ip_prefix"
+      fi
+      ;;
   esac
 done < "$tmpFile"
 ipset add -q "$swingSetName" "$ip_prefix"
