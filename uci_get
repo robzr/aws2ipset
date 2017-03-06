@@ -1,0 +1,37 @@
+#!/usr/bin/env lua
+
+cmd_uci = '/sbin/uci'
+uci_section = 'test'
+
+function uci_get (variable, default)
+  if os.execute(cmd_uci .. ' -q get ' .. uci_section .. '.' .. variable .. ' > /dev/null') == 0 then
+    local uci = assert (io.popen (cmd_uci .. ' -q get ' .. uci_section .. '.' .. variable))
+    local value = uci:read('*line')
+    uci:close()
+    return (value)
+  else
+    return (default)
+  end
+end
+
+function uci_get_list (variable, default)
+  print (cmd_uci .. ' -q get ' .. uci_section .. '.' .. variable .. ' > /dev/null') == 0 then
+  if os.execute(cmd_uci .. ' -q get ' .. uci_section .. '.' .. variable .. ' > /dev/null') == 0 then
+    local uci = assert (io.popen (cmd_uci .. ' -d "\n" -q get ' .. uci_section .. '.' .. variable))
+    local values = {}
+    local line
+    for line in uci:read('*all') do
+      local value = line
+      print ('line: ', value)
+    end
+    uci:close()
+    return (values)
+  else
+    return (default)
+  end
+end
+
+list = uci_get_list ('list1', {})
+for k, v in ipairs(list) do
+  print ('Key: ' .. k .. ' Value: ' .. v)
+end

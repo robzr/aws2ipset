@@ -20,7 +20,9 @@ Once installed, the "aws" ipset can be used in iptables rules, ex:
 
 	iptables -A input_wan_rule -p tcp --dport 22 -m set --set aws src -j ALLOW
 
-**TBD**
+**TODO**
+
+Rewriting in Lua for speed, efficiency and extensibility
 
 Add uci lists & config parsing logic to allow user to select which service(s)/region(s) are used, ex:
 
@@ -28,3 +30,27 @@ Add uci lists & config parsing logic to allow user to select which service(s)/re
 	option FilterIn 'AMAZON/us-'        # defaults to everything, or '/'
 
 (Assemble variable into $service/$region then check against sed regex processing.)
+
+Speeding up, before :
+
+	root@gw:~# time /usr/sbin/aws2ipset
+	real    0m 59.24s
+	user    0m 13.54s
+	sys     0m 42.61s
+	root@gw:~# ipset list aws  | wc -l
+	507
+
+
+Example JSON:
+
+    {
+      "ip_prefix": "52.94.248.208/28",
+      "region": "ca-central-1",
+      "service": "AMAZON"
+    },
+    {
+      "ipv6_prefix": "2a01:578:13::/64",
+      "region": "eu-central-1",
+      "service": "EC2"
+    },
+
